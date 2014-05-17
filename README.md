@@ -1,6 +1,15 @@
 ## Octotree (modified by vakata)
 
-The original extension is available at: [https://github.com/buunguyen/octotree](https://github.com/buunguyen/octotree) - kudos to buunguyen for creating it - I just decided to add a few useful features, that I am not sure will be merged in the original project.
+The original extension is available at: [https://github.com/buunguyen/octotree](https://github.com/buunguyen/octotree) - kudos to buunguyen for creating it - I just decided to add a few useful features, that I am not sure will be merged in the original project:
+1) navigation in the page is registered and reflected on the tree
+2) panel can be switched to left or to the right 
+3) panel can be resized (the size is stored per repository)
+4) per repository visibility setting
+5) gists are ignored
+6) token can be changed at any time
+7) added tree scrollbars for large trees
+8) added loading indicator
+9) updated jstree, pulling data & sorting is done by jstree, fixed a bug with state saving
 
 Browser extensions (Chrome & Firefox) to display GitHub code in tree format. Useful for developers who frequently read source in GitHub and do not want to download or checkout too many repositories. Features:
 
