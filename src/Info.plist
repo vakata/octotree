@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>Author</key>
-	<string>Buu Nguyen</string>
+	<string>Ivan Bozhanov</string>
 	<key>Builder Version</key>
 	<string>9537.75.14</string>
 	<key>CFBundleDisplayName</key>
-	<string>octotree</string>
+	<string>octotree-vakata</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.buunguyen.octotree</string>
+	<string>com.vakata.octotree</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>1.1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>Chrome</key>
@@ -58,6 +58,6 @@
 		</dict>
 	</dict>
 	<key>Website</key>
-	<string>https://github.com/buunguyen/octotree</string>
+	<string>https://github.com/vakata/octotree</string>
 </dict>
 </plist>
