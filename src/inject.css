@@ -1,6 +1,8 @@
-.octotree-sidebar { position:fixed; top:0; bottom:0; left:0; width:250px; background-color:#f8f8f8; border-right:1px solid #ddd; z-index:999991; transition:transform 0.2s ease; transform:translateX(-100%); }
-.octotree-visible { transform:translateX(0); }
+.octotree-sidebar { position:fixed; top:0; bottom:0; left:0; width:250px; background-color:#f8f8f8; border-right:1px solid #ddd; z-index:999991; transition:transform 0.2s ease; -webkit-transition:-webkit-transform 0.2s ease; transform:translateX(-100%); -webkit-transform:translateX(-100%); }
+.octotree-sidebar-right { border-left:1px solid #ddd; border-right:0; transform:translateX(100%); -webkit-transform:translateX(100%); left:auto; right:0; }
+.octotree-visible { transform:translatex(0); -webkit-transform:translateX(0); }
 .octotree-resizer { position:absolute; top:0; right:-1px; bottom:0; background:transparent; width:2px; cursor:ew-resize; }
+.octotree-sidebar-right .octotree-resizer { right:auto; left:-1px; }
 
 /* header */
 .octotree-header { height:41px; background-color:#F3F3F3; background-image:linear-gradient(#F9F9F9, #F3F3F3); background-repeat:repeat-x; border-bottom:1px solid #E5E5E5; }
@@ -28,8 +30,14 @@
 .octotree-message { padding:0 10px; text-align:center; }
 
 /* toggle button */
-.octotree-toggle { position:absolute; top:5px; right:-30px; width:30px; height:30px; padding:6px 6px !important; color:black; text-align:center; line-height:1; z-index:999992; border-left:0; border-radius:0 3px 3px 0; }
+.octotree-toggle { position:absolute !important; top:5px; right:-30px; width:30px; height:30px; padding:6px 6px !important; color:black; text-align:center; line-height:1; z-index:999992; border-left-width:0 !important; border-radius:0 3px 3px 0 !important; }
 .octotree-toggle:hover { color: #4183C4; }
 .octotree-toggle > span { font:normal normal 16px octicons; line-height:1; display:inline-block; text-decoration:none; -webkit-font-smoothing: antialiased; }
 .octotree-toggle > span:after { content: '\f078'; }
 .octotree-visible > .octotree-toggle > span:after { content: '\f0a4'; }
+.octotree-sidebar-right .octotree-toggle { right:auto; left:-30px; border-left-width:1px !important; border-right-width:0 !important; border-radius:3px 0 0 3px !important; }
+.octotree-sidebar-right .octotree-toggle > span:after { content: '\f0a4'; }
+.octotree-sidebar-right.octotree-visible > .octotree-toggle > span:after { content: '\f078'; }
+.octotree-operations { text-align:left; line-height:20px; padding:0 5px; }
+.octotree-sidebar-right .octotree-operations { text-align:right; }
+.octotree-operations > a { color:gray; text-decoration:none; font-size:10px; line-height:20px; display:inline-block; margin-right:5px }

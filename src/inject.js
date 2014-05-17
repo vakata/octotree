@@ -1,4 +1,4 @@
-// fix for translate
+// configure page (for the token & left/right & html shift (yes or no))
 
 (function($, undefined) {
 	$(document).ready(function() {
@@ -47,24 +47,36 @@
 				}
 				window.setTimeout(detectLocationChange, 200);
 			};
-		html = $('<nav class="octotree-sidebar octotree-visible">' +
+		html = $('<nav class="octotree-sidebar ' + (window.localStorage.getItem('octotree.right') === 'true' ? 'octotree-sidebar-right' : '') + '">' +
 					'<hgroup class="octotree-header">' +
 						'<h1></h1>' + 
 						'<h2></h2>' + 
 					'</hgroup>' +
 					'<form class="octotree-form">' +
 						'<p class="octotree-message"></p>' +
-						'<input name="token" type="text" placeholder="Paste access token here" value="'+tokn+'"></input>' +
+						'<input name="token" type="text" placeholder="Paste access token here" value="'+(tokn || '')+'"></input>' +
 						'<button type="submit" class="button">Save</button>' +
 					'</form>' +
 					'<div class="octotree-tree"></div>' +
 					'<a class="octotree-toggle button"><span></span></a>' +
 					'<div class="octotree-resizer"></div>' +
+					'<div class="octotree-operations"><a href="#" class="octotree-change-token"><span class="octicon octicon-key"></span></a> <a href="#" class="octotree-toggle-lt"><span class="octicon octicon-code"></span></a></div>' +
 				'</nav>')
 				.on('mousedown', '.octotree-resizer', function (e) {
 					return $.vakata.dnd.start(e, { 'octotree' : true, 'x' : e.pageX, 'w' : parseInt(html.width(),10) }, false);
 				})
-				.on('click', '.octotree-toggle', function () {
+				.on('click', '.octotree-change-token', function (e) {
+					e.preventDefault();
+					html.find('.octotree-form').show();
+					$(window).resize();
+				})
+				.on('click', '.octotree-toggle-lt', function (e) {
+					e.preventDefault();
+					html.toggleClass('octotree-sidebar-right');
+					window.localStorage.setItem('octotree.right', html.hasClass('octotree-sidebar-right'));
+				})
+				.on('click', '.octotree-toggle', function (e) {
+					e.preventDefault();
 					$(this).closest('.octotree-sidebar').toggleClass('octotree-visible');
 					window.localStorage.setItem('octotree.visible.' + repo[1] + '.' + repo[2], !window.localStorage.getItem('octotree.visible.' + repo[1] + '.' + repo[2]));
 				})
@@ -74,16 +86,17 @@
 					window.localStorage.setItem('octotree.token', tokn);
 					$(this).find('.octotree-message').text('').end().hide();
 					$(window).resize();
-					repo = null;
+					repo = [ null, null, null, null, null ];
 				})
 				.find('.octotree-tree')
 					.on('changed.jstree', function (e, data) {
 						if(data.event) {
+							$('h1 > .page-context-loader').addClass('is-context-loading');
 							$.pjax({ 
 								'url' : '/' + repo[1] + '/' + repo[2] + '/' + data.selected[0],
 								'timeout' : 5000, // TODO: progress indicator (detect from github)
 								'container' : $('#js-repo-pjax-container') 
-							});
+							}).done(function () { $('h1 > .page-context-loader').removeClass('is-context-loading'); });
 						}
 					})
 					.on('dblclick.jstree', '.jstree-open, .jstree-closed', function(e) {
@@ -160,12 +173,12 @@
 		tree = $('.octotree-tree').jstree(true);
 		$(window)
 			.on('resize', function () {
-				html.children('.octotree-tree').outerHeight($(window).height() - (html.children('.octotree-header').outerHeight() + (html.children('.octotree-form').is(':visible') ? html.children('.octotree-form').outerHeight() : 0)));
+				html.children('.octotree-tree').outerHeight($(window).height() - (20 + html.children('.octotree-header').outerHeight() + (html.children('.octotree-form').is(':visible') ? html.children('.octotree-form').outerHeight() : 0)));
 			})
 			.resize();
 		$(document).bind('dnd_move.vakata', function (e, data) {
 				if(!data.data.octotree) { return; }
-				html.width(data.data.w + (data.event.pageX - data.data.x));
+				html.width(data.data.w + (data.event.pageX - data.data.x) * (html.hasClass('octotree-sidebar-right') ? -1 : 1) );
 			})
 			.bind('dnd_stop.vakata', function (e, data) {
 				window.localStorage.setItem('octotree.width.' + repo[1] + '.' + repo[2], html.width());
