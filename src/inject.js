@@ -1,197 +1,168 @@
-(function() {
-  const PREFIX = 'octotree'
-      , TOKEN  = 'octotree.github_access_token'
-      , SHOWN  = 'octotree.shown'
-      // ugly, I know, can it be improved?
-      , REGEXP = /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?/
-      
-  var $html    = $('html')
-    , $sidebar = $('<nav class="octotree_sidebar">' +
-                     '<h1>loading...</h1>' +
-                     '<div class="tree"></div>' +
-                   '</nav>')
-    , $tree    = $sidebar.find('.tree')
-    , $token   = $('<form>' +
-                     '<div>' +
-                       '<input name="token" type="text" placeholder="Enter personal access token"></input>' +
-                     '</div>' +
-                     '<div>' +
-                       '<button type="submit">Save</button>' +
-                       '<a href="https://github.com/settings/tokens/new" target="_blank">Create token</a> | ' +
-                       '<a href="https://github.com/buunguyen/octotree#github-api-rate-limit" target="_blank">Help</a>' +
-                     '</div>' +
-                     '<div class="error"></div>' +
-                   '</form>')
-    , $toggler = $('<div class="octotree_toggle">&#9776;</div>')
-    , store    = new Storage()
+// clean dependencies
+// clean CSS
+// make resizable
+// clean the template
+// gists (gist.github.com)
+// header height & styles + ellipsis
+// fix for translate
+// move button inside
 
-  $(document).ready(function() {
-    loadRepo(true)
-  })
-
-  function loadRepo(initDom) {
-    var repo = getRepoFromPath()
-    if (repo) {
-      if (initDom) {
-        $('body')
-          .append($sidebar)
-          .append($toggler.click(toggleSidebar))
-      }
-      fetchData(repo, function(err, tree) {
-        if (err) return onFetchError(err)
-        renderTree(repo, tree)
-      })
-    }
-  }
-
-  function getRepoFromPath() {
-    var match = location.pathname.match(REGEXP)
-    if (!match) return false
-
-    // must not be a reserved `username`
-    if (~['settings', 'organizations', 'site', 'blog'].indexOf(match[1])) return false
-
-    // TODO: the intention is to hide the sidebar when users navigate to non-code areas (e.g. Issues, Pulls)
-    // and show it again when users navigate back to the code area
-    // the first part is achieved with the next two lines; but need to implement the second part
-    // before activating the entire feature, PR is welcome
-    // if match[3] exists, it must be either 'tree' or 'blob'
-    // if (match[3] && !~['tree', 'blob'].indexOf(match[3])) return false
-
-    return { 
-      username : match[1], 
-      reponame : match[2],
-      branch   : $('*[data-master-branch]').data('ref') || 'master'
-    }
-  }
-
-  function fetchData(repo, done) {
-    var github  = new Github({ token: store.get(TOKEN) })
-      , api     = github.getRepo(repo.username, repo.reponame)
-      , root    = []
-      , folders = { '': root }
-
-    api.getTree(encodeURIComponent(repo.branch) + '?recursive=true', function(err, tree) {
-      if (err) return done(err)
-      tree.forEach(function(item) {
-        var path   = item.path
-          , index  = path.lastIndexOf('/')
-          , name   = path.substring(index + 1)
-          , folder = folders[path.substring(0, index)]
-          , url    = '/' + repo.username + '/' + repo.reponame + '/' + item.type + '/' + repo.branch + '/' + path
-
-        folder.push(item)
-        item.text   = name
-        item.icon   = item.type
-        if (item.type === 'tree') {
-          folders[item.path] = item.children = []
-          item.a_attr = { href: '#' }
-        }
-        else if (item.type === 'blob') {
-          item.a_attr = { href: url }
-        }
-      })
-
-      done(null, sort(root))
-
-      function sort(folder) {
-        folder.sort(function(a, b) {
-          if (a.type === b.type) return a.text.localeCompare(b.text)
-          return a.type === 'tree' ? -1 : 1
-        })
-        folder.forEach(function(item) {
-          if (item.type === 'tree') sort(item.children)
-        })
-        return folder
-      }
-    })
-  }
-
-  function onFetchError(err) {
-    var msg = 'Error: ' + err.error
-    if (err.error === 401) msg = 'Invalid token!'
-    else if (err.error === 404) msg = 'Private or invalid repository!'
-    else if (err.error === 403 && ~err.request.getAllResponseHeaders().indexOf('X-RateLimit-Remaining: 0')) 
-      msg = 'API limit exceeded!'
-    updateSidebar(msg, true)
-  }
-
-  function renderTree(repo, tree) {
-    $tree
-      .empty()
-      .jstree({
-        core    : { data: tree, animation: 100 },
-        plugins : ['wholerow', 'state'],
-        state   : { key : PREFIX + '.' + repo.username + '/' + repo.reponame }
-      })
-      .delegate('.jstree-open>a', 'click.jstree', function() {
-        $.jstree.reference(this).close_node(this)
-      })
-      .delegate('.jstree-closed>a', 'click.jstree', function() {
-        $.jstree.reference(this).open_node(this)
-      })
-      .on('click', function(e) {
-        var $target = $(e.target)
-        if ($target.is('a.jstree-anchor') && $target.children(':first').hasClass('blob')) {
-          $.pjax({ 
-            url: $target.attr('href'), 
-            container: $('#js-repo-pjax-container') 
-          })
-        }
-      })
-      .on('ready.jstree', function() {
-        updateSidebar(repo.username + ' / ' + repo.reponame + ' [' + repo.branch + ']')  
-      })
-  }
-
-  function updateSidebar(header, askForToken) {
-    $sidebar.find('h1').text(header)
-
-    if (askForToken) {
-      $tree.empty().append($token.submit(saveToken))
-    }
-
-    // Shows sidebar when:
-    // 1. ask for access token
-    // 2. first time extension is used
-    // 3. if it was previously shown
-    if (askForToken || store.get(SHOWN) !== false) {
-      $html.addClass(PREFIX)
-      store.set(SHOWN, true)
-    }
-  }
-
-  function toggleSidebar() {
-    var shown = store.get(SHOWN)
-    if (shown) $html.removeClass(PREFIX)
-    else $html.addClass(PREFIX)
-    store.set(SHOWN, !shown)
-  } 
-
-  function saveToken(event) {
-    event.preventDefault()
-
-    var token = $token.find('[name="token"]').val()
-      , $error = $token.find('div.error').text('')
-
-    if (token === '') {
-      return $error.text('Token is required')
-    }
-    store.set(TOKEN, token)
-    loadRepo()
-  }   
-
-  function Storage() {
-    this.get = function(key) {
-      var val = localStorage.getItem(key)
-      try {
-        return JSON.parse(val)
-      } catch (e) {
-        return val
-      }
-    }
-    this.set = function(key, val) {
-      return localStorage.setItem(key, JSON.stringify(val))
-    }
-  }
-})()
+(function($, undefined) {
+	$(document).ready(function() {
+		var href = null,
+			hash = null,
+			repo = [ null, null, null, null, null ],
+			temp = [ null, null, null, null, null ],
+			tree = null,
+			html = null,
+			tokn = null,
+			detectLocationChange = function() {
+				if (location.href !== href || location.hash != hash) {
+					href = location.href;
+					hash = location.hash;
+					temp = location.pathname.match(/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?/);
+					if(
+						temp &&
+						window.location.host.indexOf('gist.') === -1 &&
+						$.inArray(temp[1], ['settings', 'orgs', 'organizations', 'site', 'blog', 'about', 'styleguide', 'showcases', 'trending', 'stars', 'dashboard', 'notifications']) === -1 && 
+						$.inArray(temp[2], ['followers', 'following']) === -1 && 
+						(!temp[3] || $.inArray(temp[3], ['tree', 'blob']) !== -1) && 
+						!$('#parallax_wrapper').length
+					) {
+						html.show();
+						temp[4] = $('*[data-master-branch]').data('ref') || 'master';
+						if(repo[1] !== temp[1] || repo[2] !== temp[2] || repo[4] !== temp[4]) {
+							repo = temp.slice();
+							tokn = window.localStorage.getItem('octotree.token.' + repo[1] + '.' + repo[2]);
+							html[window.localStorage.getItem('octotree.visible.' + repo[1] + '.' + repo[2]) ? 'addClass' : 'removeClass']('octotree-visible');
+							html.find('h1').text(repo[1] + ' / ' + repo[2]).end().find('h2').text(repo[4]);
+							tree.settings.state.key = 'octotree.' + repo[1] + '.' + repo[2];
+							tree.deselect_all();
+							tree.get_container().one('refresh.jstree', function (e, data) {
+								data.instance.select_node(window.location.pathname.toString().replace('/' + repo[1] + '/' + repo[2] + '/', ''));
+							});
+							tree.refresh();
+						}
+						else {
+							tree.deselect_all();
+							tree.select_node(window.location.pathname.toString().replace('/' + repo[1] + '/' + repo[2] + '/', ''));
+						}
+					}
+					else {
+						html.hide();
+					}
+				}
+				window.setTimeout(detectLocationChange, 200);
+			};
+		html = $('<nav class="octotree-sidebar octotree-visible">' +
+					'<hgroup class="octotree-header">' +
+						'<h1></h1>' + 
+						'<h2></h2>' + 
+					'</hgroup>' +
+					'<form class="octotree-form">' +
+						'<p class="octotree-message"></p>' +
+						'<input name="token" type="text" placeholder="Paste access token here" value=""></input>' +
+						'<button type="submit" class="button">Save</button>' +
+					'</form>' +
+					'<div class="octotree-tree"></div>' +
+					'<a class="octotree-toggle button"><span></span></a>' +
+				'</nav>')
+				.on('click', '.octotree-toggle', function () {
+					$(this).closest('.octotree-sidebar').toggleClass('octotree-visible');
+					window.localStorage.setItem('octotree.visible.' + repo[1] + '.' + repo[2], !window.localStorage.getItem('octotree.visible.' + repo[1] + '.' + repo[2]));
+				})
+				.on('submit', '.octotree-form', function (e) {
+					e.preventDefault();
+					window.localStorage.setItem('octotree.token.' + repo[1] + '.' + repo[2], $(this).find('input').val());
+					$(this).find('.octotree-message').text('').end().hide();
+					$(window).resize();
+					repo = null;
+				})
+				.find('.octotree-tree')
+					.on('changed.jstree', function (e, data) {
+						if(data.event) {
+							$.pjax({ 
+								'url' : '/' + repo[1] + '/' + repo[2] + '/' + data.selected[0],
+								'timeout' : 5000, // TODO: progress indicator (detect from github)
+								'container' : $('#js-repo-pjax-container') 
+							});
+						}
+					})
+					.on('dblclick.jstree', '.jstree-open, .jstree-closed', function(e) {
+						e.stopImmediatePropagation();
+						tree.toggle_node(this);
+					})
+					.jstree({
+						'core' : {
+							'multiple' : false,
+							'themes' : {
+								'responsive' : false
+							},
+							'data' : function (node, cb) {
+								if(node && node.id === '#' && repo[1] && repo[2]) {
+									var git = new Github({ 'token' : tokn }),
+										api = git.getRepo(repo[1], repo[2]), i, j, data = [], item = {}, m;
+									api.getTree(encodeURIComponent(repo[4]) + '?recursive=true', function(err, tree) {
+										if(err) {
+											switch(err.error) {
+												case 401:
+													m = '<strong>Invalid token!</strong><br />The token is invalid. Follow <a href="https://github.com/settings/tokens/new" target="_blank">this link</a> to create a new token and paste it in the textbox below.';
+													break;
+												case 404:
+													m = tokn ?
+														'<strong>Private or invalid repository!</strong><br />You are not allowed to access this repository.' :
+														'<strong>Private or invalid repository!</strong><br />Accessing private repositories requires a GitHub access token. Follow <a href="https://github.com/settings/tokens/new" target="_blank">this link</a> to create one and paste it in the textbox below.';
+													break;
+												default:
+													m = tokn ?
+														'<strong>API limit exceeded!</strong><br />Whoa, you have exceeded the API hourly limit, please create a new access token or take a break :).' :
+														'<strong>API limit exceeded!</strong><br />You have exceeded the GitHub API hourly limit and need GitHub access token to make extra requests. Follow <a href="https://github.com/settings/tokens/new" target="_blank">this link</a> to create one and paste it in the textbox below.';
+													break;
+											}
+											html.find('.octotree-message').html(m).closest('form').show();
+											$(window).resize();
+											cb(false);
+										}
+										else {
+											for(i = 0, j = tree.length; i < j; i++) {
+												if(tree[i].type !== 'tree' && tree[i].type !== 'blob') { continue; }
+												item = {};
+												item.id = tree[i].type + '/' + repo[4] + '/' + tree[i].path;
+												item.text = $('<div/>').text(tree[i].path.split('/').reverse()[0]).html();
+												item.parent = tree[i].path.indexOf('/') === -1 ? '#' : 'tree/' + repo[4] + '/' + tree[i].path.split('/').slice(0,-1).join('/');
+												item.icon = tree[i].type;
+												data.push(item);
+											}
+											cb(data);
+										}
+									});
+								}
+								else {
+									cb(false);
+								}
+							}
+						},
+						'sort' : function (a, b) {
+							var c = a.indexOf('tree') === 0,
+								d = b.indexOf('tree') === 0;
+							if(c && !d) { return -1; }
+							if(!c && d) { return 1; }
+							return this.get_text(a) > this.get_text(b) ? 1 : -1;
+						},
+						'state' : {
+							'filter' : function (s) {
+								delete s.core.selected;
+								return s;
+							},
+							'key' : 'octotree.default'
+						},
+						'plugins' : [ 'sort' , 'state', 'wholerow' ]
+					}).end()
+				.appendTo('body');
+		tree = $('.octotree-tree').jstree(true);
+		$(window).on('resize', function () {
+			html.children('.octotree-tree').outerHeight($(window).height() - (html.children('.octotree-header').outerHeight() + (html.children('.octotree-form').is(':visible') ? html.children('.octotree-form').outerHeight() : 0)));
+		}).resize();
+		detectLocationChange();
+	});
+})(jQuery);
