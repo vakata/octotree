@@ -1,5 +1,6 @@
 .octotree-sidebar { position:fixed; top:0; bottom:0; left:0; width:250px; background-color:#f8f8f8; border-right:1px solid #ddd; z-index:999991; transition:transform 0.2s ease; transform:translateX(-100%); }
 .octotree-visible { transform:translateX(0); }
+.octotree-resizer { position:absolute; top:0; right:-1px; bottom:0; background:transparent; width:2px; cursor:ew-resize; }
 
 /* header */
 .octotree-header { height:41px; background-color:#F3F3F3; background-image:linear-gradient(#F9F9F9, #F3F3F3); background-repeat:repeat-x; border-bottom:1px solid #E5E5E5; }
@@ -24,6 +25,7 @@
 .octotree-form { display:none; margin:0; padding:10px 0; border-bottom:1px solid #ddd; }
 .octotree-form input { width:90%; margin:5px auto; display:block; }
 .octotree-form button { width:50%; margin:5px auto; min-width:120px; display:block; }
+.octotree-message { padding:0 10px; text-align:center; }
 
 /* toggle button */
 .octotree-toggle { position:absolute; top:5px; right:-30px; width:30px; height:30px; padding:6px 6px !important; color:black; text-align:center; line-height:1; z-index:999992; border-left:0; border-radius:0 3px 3px 0; }
