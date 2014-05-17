@@ -26,8 +26,8 @@
 						temp[4] = $('*[data-master-branch]').data('ref') || 'master';
 						if(repo[1] !== temp[1] || repo[2] !== temp[2] || repo[4] !== temp[4]) {
 							repo = temp.slice();
-							html[window.localStorage.getItem('octotree.visible.' + repo[1] + '.' + repo[2]) ? 'addClass' : 'removeClass']('octotree-visible');
-							html.width(window.localStorage.getItem('octotree.width.' + repo[1] + '.' + repo[2]) || 250);
+							html[parseInt(window.localStorage.getItem('octotree.visible.' + repo[1] + '.' + repo[2]), 10) ? 'addClass' : 'removeClass']('octotree-visible');
+							html.width(parseInt(window.localStorage.getItem('octotree.width.' + repo[1] + '.' + repo[2]), 10) || 250);
 							html.find('h1').text(repo[1] + ' / ' + repo[2]).end().find('h2').text(repo[4]);
 							tree.settings.state.key = 'octotree.' + repo[1] + '.' + repo[2];
 							tree.deselect_all();
@@ -47,7 +47,7 @@
 				}
 				window.setTimeout(detectLocationChange, 200);
 			};
-		html = $('<nav class="octotree-sidebar ' + (window.localStorage.getItem('octotree.right') === 'true' ? 'octotree-sidebar-right' : '') + '">' +
+		html = $('<nav class="octotree-sidebar ' + (parseInt(window.localStorage.getItem('octotree.right'),10) ? 'octotree-sidebar-right' : '') + '">' +
 					'<hgroup class="octotree-header">' +
 						'<h1></h1>' + 
 						'<h2></h2>' + 
@@ -73,12 +73,12 @@
 				.on('click', '.octotree-toggle-lt', function (e) {
 					e.preventDefault();
 					html.toggleClass('octotree-sidebar-right');
-					window.localStorage.setItem('octotree.right', html.hasClass('octotree-sidebar-right'));
+					window.localStorage.setItem('octotree.right', html.hasClass('octotree-sidebar-right') ? 1 : 0);
 				})
 				.on('click', '.octotree-toggle', function (e) {
 					e.preventDefault();
-					$(this).closest('.octotree-sidebar').toggleClass('octotree-visible');
-					window.localStorage.setItem('octotree.visible.' + repo[1] + '.' + repo[2], !window.localStorage.getItem('octotree.visible.' + repo[1] + '.' + repo[2]));
+					html.toggleClass('octotree-visible');
+					window.localStorage.setItem('octotree.visible.' + repo[1] + '.' + repo[2], html.hasClass('octotree-visible') ? 1 : 0);
 				})
 				.on('submit', '.octotree-form', function (e) {
 					e.preventDefault();
@@ -181,7 +181,7 @@
 				html.width(data.data.w + (data.event.pageX - data.data.x) * (html.hasClass('octotree-sidebar-right') ? -1 : 1) );
 			})
 			.bind('dnd_stop.vakata', function (e, data) {
-				window.localStorage.setItem('octotree.width.' + repo[1] + '.' + repo[2], html.width());
+				window.localStorage.setItem('octotree.width.' + repo[1] + '.' + repo[2], parseInt(html.width(),10));
 			});
 		detectLocationChange();
 	});
