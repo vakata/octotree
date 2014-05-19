@@ -39,6 +39,7 @@
 						else {
 							tree.deselect_all();
 							tree.select_node(window.location.pathname.toString().replace('/' + repo[1] + '/' + repo[2] + '/', ''));
+							tree.open_node(window.location.pathname.toString().replace('/' + repo[1] + '/' + repo[2] + '/', ''));
 						}
 					}
 					else {

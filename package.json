@@ -1,0 +1,33 @@
+{
+  "name": "octrotree-vakata",
+  "title": "octrotree-vakata",
+  "description": "Display GitHub code in tree format",
+  "version": "1.1.0",
+  "homepage": "https://github.com/vakata/octotree",
+  "author": {
+    "name": "Ivan Bozhanov",
+    "url": "http://vakata.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vakata/octotree.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vakata/octotree/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/vakata/octotree/blob/master/LICENSE-MIT"
+    }
+  ],
+  "keywords": [],
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-cssmin": "*"
+  },
+  "dependencies": {
+  }
+}

@@ -19,21 +19,11 @@
         "https://github.com/*"
       ],
       "css": [
-        "lib/css/jstree.css",
-        "inject.css"
+        "data/octotree-vakata.css"
       ],
       "js": [
-        "lib/js/underscore.js",
-        "lib/js/jquery.js",
-        "lib/js/jstree.js",
-        "lib/js/jquery.pjax.js",
-        "lib/js/base64.js",
-        "lib/js/github.js",
-        "inject.js"
+        "data/octotree-vakata.js"
       ]
     }
-  ],
-  "web_accessible_resources": [
-    "lib/images/*"
   ]
 }

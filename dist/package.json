@@ -1,0 +1,14 @@
+{
+  "name": "octotree-vakata",
+  "title": "octotree-vakata",
+  "id": "jid1-vq1JY96wLfEcrw",
+  "description": "Display GitHub code in tree format",
+  "author": "Ivan Bozhanov",
+  "license": "MIT",
+  "version": "1.1.0",
+  "icon": "icons/icon48.png",
+  "icon64": "icons/icon64.png",
+  "lib" : "data",
+  "data" : "data",
+  "main" : "firefox"
+}
