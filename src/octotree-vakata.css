@@ -10,14 +10,13 @@
 .octotree-header > h2 { margin:0; padding:0 8px; font-weight:normal; text-overflow:ellipsis; white-space:nowrap; }
 .octotree-header > h1 { line-height:22px; height:22px; font-size:16px; }
 .octotree-header > h2 { line-height:18px; height:18px; font-size:12px; }
-.octotree-header > h1:before { font-family:octicons; content:'\f001'; color:#bbb; margin-right:4px; width:16px; display:inline-block; text-align:center; }
-.octotree-header > h2:before { font-family:octicons; content:'\f020'; color:#bbb; margin-right:4px; width:16px; display:inline-block; text-align:center; }
+.octotree-header i { color:#bbb; margin-right:4px; width:16px; display:inline-block; text-align:center; }
 
 /* jstree overrides */
 .octotree-tree { padding:10px 0; overflow:auto; }
 .octotree-sidebar .tree, .octotree-sidebar .blob { font:normal normal 16px octicons; display:inline-block; margin-right:5px; text-decoration:none; -webkit-font-smoothing:antialiased; }
-.octotree-sidebar .tree:before { content:'\f016'; color:#80a6cd; }
-.octotree-sidebar .blob:before { content:'\f011'; color:#777; }
+.octotree-sidebar .octicon-file-directory { color:#80a6cd; }
+.octotree-sidebar .octicon-file-text { color:#777; }
 .octotree-sidebar .jstree-anchor { color:#4183c4 !important; }
 .octotree-sidebar .jstree-anchor:hover { text-decoration:none !important; /* Safari needs this */ }
 .octotree-sidebar .jstree-wholerow-hovered { background:#eee; }

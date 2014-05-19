@@ -28,7 +28,7 @@
 							repo = temp.slice();
 							html[parseInt(window.localStorage.getItem('octotree.visible.' + repo[1] + '.' + repo[2]), 10) ? 'addClass' : 'removeClass']('octotree-visible');
 							html.width(parseInt(window.localStorage.getItem('octotree.width.' + repo[1] + '.' + repo[2]), 10) || 250);
-							html.find('h1').text(repo[1] + ' / ' + repo[2]).end().find('h2').text(repo[4]);
+							html.find('h1').html('<i class="octicon octicon-repo"></i>' + repo[1] + ' / ' + repo[2]).end().find('h2').html('<i class="octicon octicon-git-branch"></i>' + repo[4]);
 							tree.settings.state.key = 'octotree.' + repo[1] + '.' + repo[2];
 							tree.deselect_all();
 							tree.get_container().one('refresh.jstree', function (e, data) {
@@ -142,7 +142,7 @@
 												item.id = tree[i].type + '/' + repo[4] + '/' + tree[i].path;
 												item.text = $('<div/>').text(tree[i].path.split('/').reverse()[0]).html();
 												item.parent = tree[i].path.indexOf('/') === -1 ? '#' : 'tree/' + repo[4] + '/' + tree[i].path.split('/').slice(0,-1).join('/');
-												item.icon = tree[i].type;
+												item.icon = tree[i].type === 'tree' ? 'octicon octicon-file-directory' : 'octicon octicon-file-text';
 												data.push(item);
 											}
 											cb(data);
