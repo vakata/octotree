@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       js: {
-        src: [ 'libs/jquery.js', 'libs/jstree.js', 'libs/jstree.sort.js', 'libs/jstree.state.js', 'libs/jstree.wholerow.js', 'libs/jquery.pjax.js', 'libs/base64.js', 'libs/github.js', 'src/octotree-vakata.js' ],
+        src: [ 'libs/jquery.js', 'libs/jstree.js', 'libs/vakata.js', 'libs/jstree.sort.js', 'libs/jstree.state.js', 'libs/jstree.wholerow.js', 'libs/jquery.pjax.js', 'libs/base64.js', 'libs/github.js', 'src/octotree-vakata.js' ],
         dest: 'dist/data/octotree-vakata.js'
       },
       css: {

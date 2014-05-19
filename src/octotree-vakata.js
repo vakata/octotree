@@ -177,7 +177,8 @@
 				html.children('.octotree-tree').outerHeight($(window).height() - (20 + html.children('.octotree-header').outerHeight() + (html.children('.octotree-form').is(':visible') ? html.children('.octotree-form').outerHeight() : 0)));
 			})
 			.resize();
-		$(document).bind('dnd_move.vakata', function (e, data) {
+		$(document)
+			.bind('dnd_move.vakata', function (e, data) {
 				if(!data.data.octotree) { return; }
 				html.width(data.data.w + (data.event.pageX - data.data.x) * (html.hasClass('octotree-sidebar-right') ? -1 : 1) );
 			})
