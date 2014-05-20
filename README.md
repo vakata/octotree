@@ -1,5 +1,7 @@
 ## Octotree (modified by vakata)
 
+The original great extension by @buunguyen is available [here](https://github.com/buunguyen/octotree)
+
 Browser extensions (Chrome & Opera & Firefox & Safari) to display the GitHub source code tree in a resizable sidebar. Private repositories are also supported.
 
 ### GitHub API Rate Limit
