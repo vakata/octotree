@@ -10,14 +10,14 @@
 			html = null,
 			tokn = window.localStorage.getItem('octotree.token'),
 			detectLocationChange = function() {
-				if (!repo[1] || location.href !== href || location.hash != hash) {
+				if (!repo[1] || location.href !== href || location.hash !== hash) {
 					href = location.href;
 					hash = location.hash;
 					temp = location.pathname.match(/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?/);
 					if(
 						temp &&
 						window.location.host.indexOf('gist.') === -1 &&
-						$.inArray(temp[1], ['settings', 'orgs', 'organizations', 'site', 'blog', 'about', 'styleguide', 'showcases', 'trending', 'stars', 'dashboard', 'notifications']) === -1 && 
+						$.inArray(temp[1], ['settings', 'orgs', 'organizations', 'site', 'blog', 'explore', 'about', 'styleguide', 'showcases', 'trending', 'stars', 'dashboard', 'notifications']) === -1 && 
 						$.inArray(temp[2], ['followers', 'following']) === -1 && 
 						(!temp[3] || $.inArray(temp[3], ['tree', 'blob']) !== -1) && 
 						!$('#parallax_wrapper').length
@@ -95,9 +95,11 @@
 							$('h1 > .page-context-loader').addClass('is-context-loading');
 							$.pjax({ 
 								'url' : '/' + repo[1] + '/' + repo[2] + '/' + data.selected[0],
-								'timeout' : 5000, // TODO: progress indicator (detect from github)
-								'container' : $('#js-repo-pjax-container') 
-							}).done(function () { $('h1 > .page-context-loader').removeClass('is-context-loading'); });
+								'timeout' : 5000,
+								'container' : $('#js-repo-pjax-container')
+							}).done(function (resp) {
+								$('h1 > .page-context-loader').removeClass('is-context-loading');
+							});
 						}
 					})
 					.on('dblclick.jstree', '.jstree-open, .jstree-closed', function(e) {
@@ -112,11 +114,17 @@
 							},
 							'data' : function (node, cb) {
 								if(node && node.id === '#' && repo[1] && repo[2]) {
-									var git = new Github({ 'token' : tokn }),
-										api = git.getRepo(repo[1], repo[2]), i, j, data = [], item = {}, m;
-									api.getTree(encodeURIComponent(repo[4]) + '?recursive=true', function(err, tree) {
-										if(err) {
-											switch(err.error) {
+									var cnf = {
+											'method' : 'GET',
+											'url' : 'https://api.github.com/repos/' + repo[1] + '/' + repo[2] + '/git/trees/' + encodeURIComponent(repo[4]) + '?recursive=true'
+										},
+										i, j, rslt = [], item = {}, m;
+									if(tokn) {
+										cnf.headers.Authorization = 'token ' + tokn;
+									}
+									$.ajax(cnf)
+										.fail(function (xhr, err) {
+											switch(parseInt(xhr.status,10)) {
 												case 401:
 													m = '<strong>Invalid token!</strong><br />The token is invalid. Follow <a href="https://github.com/settings/tokens/new" target="_blank">this link</a> to create a new token and paste it in the textbox below.';
 													break;
@@ -134,8 +142,9 @@
 											html.find('.octotree-message').html(m).closest('form').show();
 											$(window).resize();
 											cb(false);
-										}
-										else {
+										})
+										.done(function (data) {
+											var tree = data.tree;
 											for(i = 0, j = tree.length; i < j; i++) {
 												if(tree[i].type !== 'tree' && tree[i].type !== 'blob') { continue; }
 												item = {};
@@ -143,11 +152,10 @@
 												item.text = $('<div/>').text(tree[i].path.split('/').reverse()[0]).html();
 												item.parent = tree[i].path.indexOf('/') === -1 ? '#' : 'tree/' + repo[4] + '/' + tree[i].path.split('/').slice(0,-1).join('/');
 												item.icon = tree[i].type === 'tree' ? 'octicon octicon-file-directory' : 'octicon octicon-file-text';
-												data.push(item);
+												rslt.push(item);
 											}
-											cb(data);
-										}
-									});
+											cb(rslt);
+										});
 								}
 								else {
 									cb(false);

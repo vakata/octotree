@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       js: {
-        src: [ 'libs/jquery.js', 'libs/jstree.js', 'libs/vakata.js', 'libs/jstree.sort.js', 'libs/jstree.state.js', 'libs/jstree.wholerow.js', 'libs/jquery.pjax.js', 'libs/base64.js', 'libs/github.js', 'src/octotree-vakata.js' ],
+        src: [ 'libs/jquery.js', 'libs/jquery.pjax.js', 'libs/vakata.js', 'libs/jstree.js', 'libs/jstree.sort.js', 'libs/jstree.state.js', 'libs/jstree.wholerow.js', 'src/octotree-vakata.js' ],
         dest: 'dist/data/octotree-vakata.js'
       },
       css: {
@@ -20,18 +20,41 @@ module.exports = function(grunt) {
         preserveComments: false,
         report: "min",
         beautify: {
-                ascii_only: true
+          ascii_only: true
         },
         compress: {
-                hoist_funs: false,
-                loops: false,
-                unused: false
+          hoist_funs: false,
+          loops: false,
+          unused: false
         }
       },
       dist: {
         src: ['dist/data/octotree-vakata.js'],
         dest: 'dist/data/octotree-vakata.js'
       }
+    },
+    jshint: {
+      options: {
+        'curly' : true,
+        'eqeqeq' : true,
+        'latedef' : true,
+        'newcap' : true,
+        'noarg' : true,
+        'sub' : true,
+        'undef' : true,
+        'boss' : true,
+        'eqnull' : true,
+        'browser' : true,
+        'trailing' : true,
+        'globals' : {
+          'console' : true,
+          'jQuery' : true,
+          'browser' : true,
+          'XSLTProcessor' : true,
+          'ActiveXObject' : true
+        }
+      },
+      src: [ 'libs/vakata.js', 'libs/jstree.js', 'libs/jstree.sort.js', 'libs/jstree.state.js', 'libs/jstree.wholerow.js', 'src/octotree-vakata.js' ]
     },
     cssmin: {
       dist: {
@@ -44,8 +67,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
 
   // Default task.
-  grunt.registerTask('default', ['concat','uglify','cssmin']);
+  grunt.registerTask('default', ['concat','jshint:src','uglify','cssmin']);
 };

@@ -1,4 +1,7 @@
 (function ($) {
+	if(!$.vakata) {
+		$.vakata = {};
+	}
 	// private variable
 	var vakata_dnd = {
 		element	: false,
